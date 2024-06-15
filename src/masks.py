@@ -1,7 +1,9 @@
 import datetime
 from typing import Any, Dict, Union
 
-from src.utils import read_data_from_json
+from src.utils import read_data_from_json, setup_logger
+
+logger = setup_logger("masks")
 
 
 def calculate_sales_by_day_of_week(data: Union[dict, list]) -> Dict[str, float]:

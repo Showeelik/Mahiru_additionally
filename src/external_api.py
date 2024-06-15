@@ -5,7 +5,9 @@ from typing import Any, Dict, Optional, Union
 import requests
 
 from src.decorators import retry
+from src.utils import setup_logger
 
+logger = setup_logger("external_api")
 
 @retry()
 def get_api_request(
@@ -23,16 +25,22 @@ def get_api_request(
     try:
         response = requests.get(url, params=params, headers=headers)
         response.raise_for_status()  # This will raise HTTPError for bad responses
+        logger.info(f"API request sent to {url}")
     except requests.exceptions.ConnectionError as e:
+        logger.error(f"API connection error: {e}")
         raise requests.exceptions.ConnectionError("API connection error: " + str(e))
     except requests.exceptions.HTTPError as e:
+        logger.error(f"API request error: {e}")
         raise requests.exceptions.HTTPError("API request error: " + str(e))
     except requests.exceptions.Timeout as e:
+        logger.error(f"API request timeout: {e}")
         raise requests.exceptions.Timeout("API request timeout: " + str(e))
     except requests.exceptions.RequestException as e:
+        logger.error(f"API request error: {e}")
         raise requests.exceptions.RequestException("API request error: " + str(e))
     else:
         if not response.content:
+            logger.error("API request returned an empty response")
             raise ValueError("API request returned an empty response")
     return response
 
@@ -49,6 +57,7 @@ def get_api_key(value: str) -> str | None:
     try:
         return os.getenv(value)
     except KeyError:
+        logger.error("API key not found in environment variables")
         raise KeyError("API key not found in environment variables")
 
 
@@ -65,7 +74,9 @@ def get_weather_data(city: str) -> Union[Any, None]:
 
     response = get_api_request(api_url, params=params)
     if not response:
+        logger.error("API request failed")
         return None
+    logger.info("API request successful")
     data = response.json()
     return data
 
@@ -77,7 +88,7 @@ def output_data(city: str) -> None:
     """
     data = get_weather_data(city)
     if not data:
-        print("Ошибка при получении данных о погоде.")
+        logger.error("Ошибка при получении данных о погоде.")
         return
 
     timezone = datetime.timezone(datetime.timedelta(seconds=data["timezone"]))
