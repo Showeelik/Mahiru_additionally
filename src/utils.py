@@ -1,15 +1,17 @@
+import datetime
 import json
+import logging
 import os
 from typing import Union
-import logging
-import datetime
 
 
 def setup_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)-7s - %(name)s:%(lineno)d -> %(message)s')
-    logger_file_handler = logging.FileHandler(f'logs\\{datetime.datetime.now().strftime("%Y-%m-%d")}.log', encoding='utf-8')
+    formatter = logging.Formatter("%(asctime)s - %(levelname)-7s - %(name)s:%(lineno)d -> %(message)s")
+    logger_file_handler = logging.FileHandler(
+        f'logs\\{datetime.datetime.now().strftime("%Y-%m-%d")}.log', encoding="utf-8"
+    )
     logger_console_handler = logging.StreamHandler()
     logger_console_handler.setFormatter(formatter)
     logger.addHandler(logger_console_handler)

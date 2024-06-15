@@ -9,6 +9,7 @@ from src.utils import setup_logger
 
 logger = setup_logger("external_api")
 
+
 @retry()
 def get_api_request(
     url: str, params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, Any]] = None
